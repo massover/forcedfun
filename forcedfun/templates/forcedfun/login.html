@@ -1,0 +1,14 @@
+{% extends 'forcedfun/base.html' %}
+{% load static %}
+
+{% block body %}
+<div>
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Login</button>
+    <a href="{% url "register" %}" type="button" style="padding-left: 2em;">Register</a>
+  </form>
+</div>
+
+{% endblock body %}

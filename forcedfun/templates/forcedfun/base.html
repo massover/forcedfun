@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>forcedfun</title>
+    <!-- needed for adaptive design -->
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="{% static 'terminal.css' %}">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.png' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            padding: 2em;
+            margin: auto;
+        }
+    </style>
+  </head>
+  <body>
+    <div>
+      <p>
+        <strong>forced fun</strong>
+
+        {% if user.is_authenticated %}
+          <span style="float: right;">{{ user.username }}
+          | <a href="#" onclick="document.getElementById('logout-form').submit();">Logout</a>
+            <form id="logout-form" method="POST" action="{% url 'logout' %}" style="display: none;">
+              {% csrf_token %}
+            </form>
+          </span>
+        {% endif %}
+      </p>
+    </div>
+    {% block body %}{% endblock %}
+  </body>
+</html>

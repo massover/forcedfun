@@ -1,0 +1,45 @@
+{% extends 'forcedfun/base.html' %}
+{% load static %}
+
+{% block body %}
+<h1>{{ game.slug }}</h1>
+
+<p>Would you rather</p>
+
+<main>
+
+  <table>
+    <tr>
+      <th>&nbsp;</th>
+      {% for user in users %}
+      <th>{{ user.username }}</th>
+      {% endfor %}
+    </tr>
+    <tr>
+      <td>Score</td>
+      {% for user in users %}
+      <td>{{ user.points }}</td>
+      {% endfor %}
+    </tr>
+  <table>
+    <tr>
+      <th>Question</th>
+      <th>Options</th>
+      <th>Points</th>
+    </tr>
+
+  {% for question in questions reversed %}
+    <tr>
+      <td style="text-align: right">
+        {% if question.scored_at %}<small>&#10004;</small>{% endif %}
+        {{ forloop.revcounter }}
+      </td>
+      <td><a href="{% url "question-detail" pk=question.pk %}">{{ question.options|join:" or " }}</a> </td>
+      <td>{{ question.points }}</td>
+    </tr>
+  {% endfor %}
+
+  </table>
+</main>
+
+{% endblock body %}

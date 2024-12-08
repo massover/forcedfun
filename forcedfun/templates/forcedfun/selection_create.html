@@ -1,0 +1,24 @@
+{% extends 'forcedfun/base.html' %}
+{% load static %}
+
+{% block body %}
+<h1>{{ game.slug }}</h1>
+<main>
+  <fieldset>
+    <p><small>{{ question.points }} point {{ question.points|pluralize }}</small></p>
+    {% if user.id == question.respondent_id %}
+      <p> {{ user.username }}, would you rather:</p>
+    {% else %}
+      <p> Would {{ question.respondent.username }} rather: </p>
+    {% endif %}
+    {% for option, form in options_forms %}
+      <form method="POST" action="{% url "selection-create" question_pk=question.pk %}">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit">{{ option }}</button>
+      </form>
+    {% endfor %}
+  </fieldset>
+</main>
+
+{% endblock body %}

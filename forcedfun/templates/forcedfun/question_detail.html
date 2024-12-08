@@ -1,0 +1,52 @@
+{% extends 'forcedfun/base.html' %}
+{% load static %}
+
+{% block body %}
+<h1>{{ game.slug }}</h1>
+<a href="{% url 'game-detail' game.slug %}"><< Back</a>
+
+<main>
+   <p>
+     <small>{{ question.points }} point {{ question.points|pluralize }}</small>
+   </p>
+  <p> Would {{ question.respondent.username }} rather: </p>
+  <table>
+    {% for option in question.options %}
+      <tr>
+        <td>{{ option }}</td>
+        <td>
+          {% if not respondent_selection %}
+            &#63;
+          {% elif forloop.counter0 == respondent_selection.option_idx %}
+            &#10004;
+          {% else %}
+            &#10005;
+          {% endif %}</td>
+      <tr>
+    {% endfor %}
+  </table>
+
+  <table>
+    <tr>
+    <th>&nbsp;</th>
+    <th>Selection</th>
+    </tr>
+
+    {% for user in users %}
+      <tr>
+      <td> {{ user.username }}</td>
+      {% if user.option_idx is not None %}
+      <td
+        class="{% if question.answer_idx is None %}{% elif question.answer_idx == user.option_idx %}correct{% else %}wrong{% endif %}"
+      >
+        {{ user.option_text }}
+      </td>
+      {% else %}
+      <td>&#63;</td>
+      {% endif %}
+      </tr>
+    {% endfor %}
+  </table>
+</main>
+
+{% endblock body %}
