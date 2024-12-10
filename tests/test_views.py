@@ -81,7 +81,7 @@ class TestGameDetailView:
 class TestQuestionDetailView:
     def test_ok(self, user_client, user):
         question = factories.question_factory()
-        selection = factories.selection_factory(user=user, question=question)
+        factories.selection_factory(user=user, question=question)
         url = reverse("question-detail", kwargs={"pk": question.pk})
         response = user_client.get(url)
         assert response.status_code == 200

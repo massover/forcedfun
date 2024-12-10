@@ -14,7 +14,13 @@ REPO_DIR = PACKAGE_DIR.parent
 DATABASE_URL = os.getenv(
     "DATABASE_URL", "postgres://forcedfun:@localhost:5432/forcedfun"
 )
-DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=500)}
+
+test_options = {"NAME": DATABASE_URL.split("/")[-1]}
+DATABASES = {
+    "default": dj_database_url.parse(
+        DATABASE_URL, conn_max_age=500, test_options=test_options
+    )
+}
 
 DEBUG = getbool("DEBUG", False)
 
@@ -77,7 +83,7 @@ LOGIN_URL = reverse_lazy("login")
 LOGIN_REDIRECT_URL = reverse_lazy("index")
 LOGOUT_REDIRECT_URL = reverse_lazy("login")
 
-import django_stubs_ext
+import django_stubs_ext  # noqa: E402
 
 django_stubs_ext.monkeypatch()
 

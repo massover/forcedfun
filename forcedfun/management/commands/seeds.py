@@ -15,7 +15,7 @@ def seed_user(username: str, password: str) -> User:
 
 class Command(BaseCommand):
     def handle(self, *args: typing.Any, **option: typing.Any) -> None:
-        admin = seed_user(username="admin", password="password")
+        seed_user(username="admin", password="password")
         june = seed_user(username="june", password="password")
         bruce = seed_user(username="bruce", password="password")
         respondent = seed_user(username="respondent", password="password")
