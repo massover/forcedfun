@@ -69,7 +69,7 @@ class Question(BaseModel):
 
 class Game(BaseModel):
     slug = models.SlugField()
-    users = models.ManyToManyField("auth.User")
+    users = models.ManyToManyField("auth.User", blank=True)
 
     def __str__(self) -> str:
         return self.slug

@@ -30,7 +30,10 @@ class Migration(migrations.Migration):
                 ("created_at", models.DateTimeField(auto_now_add=True, null=True)),
                 ("updated_at", models.DateTimeField(auto_now=True, null=True)),
                 ("slug", models.SlugField()),
-                ("users", models.ManyToManyField(to=settings.AUTH_USER_MODEL)),
+                (
+                    "users",
+                    models.ManyToManyField(to=settings.AUTH_USER_MODEL, blank=True),
+                ),
             ],
             options={
                 "default_related_name": "games",
