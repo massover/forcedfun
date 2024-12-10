@@ -16,6 +16,7 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views import View
 from django.views.decorators.http import require_GET
 
@@ -50,7 +51,14 @@ def register_view(request: HttpRequest) -> HttpResponse:
     if request.method == "POST" and form.is_valid():
         user = form.save()
         login(request, user)
-        return HttpResponseRedirect(reverse("index"))
+        next = request.GET.get("next")
+        url_is_safe = url_has_allowed_host_and_scheme(
+            url=next,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        )
+        redirect_to = next if url_is_safe else reverse("index")
+        return HttpResponseRedirect(redirect_to)
     return render(request, "forcedfun/register.html", {"form": form})
 
 

@@ -17,6 +17,7 @@ from forcedfun.settings.utils import getbool
 def test_for_cov():
     import forcedfun.settings.production
     import forcedfun.settings.local
+    import forcedfun.wsgi
 
 
 @pytest.mark.django_db
