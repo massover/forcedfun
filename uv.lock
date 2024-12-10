@@ -201,6 +201,9 @@ test = [
     { name = "pytest-cov" },
     { name = "pytest-django" },
 ]
+viz = [
+    { name = "pydotplus" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -227,6 +230,7 @@ test = [
     { name = "pytest-cov", specifier = ">=6.0.0" },
     { name = "pytest-django", specifier = ">=4.9.0" },
 ]
+viz = [{ name = "pydotplus", specifier = ">=2.0.2" }]
 
 [[package]]
 name = "gunicorn"
@@ -349,6 +353,24 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/14/a1/bb73a69be6e81c5efada523e4d14315b6a96f9646470579eebc5f4c84fa0/psycopg_binary-3.1.19-cp312-cp312-musllinux_1_1_ppc64le.whl", hash = "sha256:fb9758473200384a04374d0e0cac6f451218ff6945a024f65a1526802c34e56e", size = 2727571 },
     { url = "https://files.pythonhosted.org/packages/42/22/ddf89b525526626650dccec6ef0fa09d22099dedbee27a5e1ed386a12f9a/psycopg_binary-3.1.19-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:0e991632777e217953ac960726158987da684086dd813ac85038c595e7382c91", size = 2699438 },
     { url = "https://files.pythonhosted.org/packages/5b/05/a210ec623bb24045e5b9a3fd94730d617ce157f45c95561169a7b5126855/psycopg_binary-3.1.19-cp312-cp312-win_amd64.whl", hash = "sha256:1d87484dd42c8783c44a30400949efb3d81ef2487eaa7d64d1c54df90cf8b97a", size = 2883779 },
+]
+
+[[package]]
+name = "pydotplus"
+version = "2.0.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyparsing" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/60/bf/62567830b700d9f6930e9ab6831d6ba256f7b0b730acb37278b0ccdffacf/pydotplus-2.0.2.tar.gz", hash = "sha256:91e85e9ee9b85d2391ead7d635e3d9c7f5f44fd60a60e59b13e2403fa66505c4", size = 278677 }
+
+[[package]]
+name = "pyparsing"
+version = "3.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/8c/d5/e5aeee5387091148a19e1145f63606619cb5f20b83fccb63efae6474e7b2/pyparsing-3.2.0.tar.gz", hash = "sha256:cbf74e27246d595d9a74b186b810f6fbb86726dbf3b9532efb343f6d7294fe9c", size = 920984 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/be/ec/2eb3cd785efd67806c46c13a17339708ddc346cbb684eade7a6e6f79536a/pyparsing-3.2.0-py3-none-any.whl", hash = "sha256:93d9577b88da0bbea8cc8334ee8b918ed014968fd2ec383e868fb8afb1ccef84", size = 106921 },
 ]
 
 [[package]]

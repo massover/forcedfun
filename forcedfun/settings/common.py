@@ -84,4 +84,5 @@ django_stubs_ext.monkeypatch()
 # https://docs.djangoproject.com/en/5.1/ref/settings/#csrf-trusted-origins
 CSRF_TRUSTED_ORIGINS = [
     "https://*.ondigitalocean.app",
+    "https://*.maketheculture.com",
 ]

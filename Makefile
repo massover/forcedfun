@@ -23,7 +23,7 @@ migrate:
 db: dropdb createdb migrate seeds
 
 install:
-	uv sync
+	uv sync --all-groups
 
 test:
 	uv run pytest
@@ -60,9 +60,6 @@ seeds:
 
 mypy:
 	uv run mypy forcedfun --strict
-
-superuser:
-	echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser(username='admin', password='password')" | uv run python manage.py shell
 
 serve:
 	uv run ./manage.py runserver

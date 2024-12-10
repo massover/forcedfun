@@ -94,8 +94,12 @@ def game_detail_view(request: AuthenticatedHttpRequest, slug: str) -> HttpRespon
 def question_detail_view(request: AuthenticatedHttpRequest, pk: int) -> HttpResponse:
     question = get_object_or_404(Question, pk=pk)
     # if selection does not exists for this player then redirect to selection create
+    check = (
+        question.scored_at is None
+        and not Selection.objects.filter(question=question, user=request.user).exists()
+    )
     utils.check_or_302(
-        not Selection.objects.filter(question=question, user=request.user).exists(),
+        check,
         redirect_to=reverse("selection-create", kwargs={"question_pk": question.pk}),
     )
 
@@ -169,7 +173,7 @@ class SelectionCreateView(View):
     def perform_score_question(
         self, scored_selections: typing.Sequence[Selection], question: Question
     ) -> Question:
-        if scored_selections:  # pragma: ignore
+        if scored_selections:  # pragma: no branch
             Selection.objects.bulk_update(scored_selections, fields=["points"])
             question.scored_at = timezone.now()
             question.save(update_fields=["scored_at"])
