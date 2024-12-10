@@ -10,6 +10,11 @@ ENV UV_COMPILE_BYTECODE=1
 # Copy from the cache instead of linking since it's a mounted volume
 ENV UV_LINK_MODE=copy
 
+# This doesn't work at deployment time unless we add the files before running sync
+# Presumably the --mount doesn't work
+ADD pyproject.toml /app
+ADD uv.lock /app
+
 # Install the project's dependencies using the lockfile and settings
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
@@ -30,4 +35,4 @@ ENTRYPOINT []
 
 RUN python ./manage.py collectstatic --no-input
 
-CMD ["gunicorn", "forcedfun.wsgi", "-b", "0.0.0.0:8000", "-w", "${GUNICORN_CONCURRENCY:-3}", "--timeout", "${GUNICORN_TIMEOUT:-60}"]
+CMD gunicorn forcedfun.wsgi -b 0.0.0.0:8080 -w ${GUNICORN_CONCURRENCY:-3} --timeout ${GUNICORN_TIMEOUT:-60}

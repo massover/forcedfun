@@ -48,7 +48,9 @@ cov:
 
 build:
 	docker build \
+		  --progress=plain \
 		  -t forcedfun:local \
+		  --no-cache \
 		  .
 shell:
 	uv run ./manage.py shell_plus
