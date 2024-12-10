@@ -2,7 +2,7 @@ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 import os
 
-from .common import *
+from .common import *  # noqa: F403
 
 sentry_sdk.init(
     environment=os.getenv("ENVIRONMENT"),

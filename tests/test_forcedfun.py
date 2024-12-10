@@ -15,9 +15,9 @@ from forcedfun.settings.utils import getbool
 
 
 def test_for_cov():
-    import forcedfun.settings.production
-    import forcedfun.settings.local
-    import forcedfun.wsgi
+    import forcedfun.settings.production  # noqa: F401
+    import forcedfun.settings.local  # noqa: F401
+    import forcedfun.wsgi  # noqa: F401
 
 
 @pytest.mark.django_db
@@ -37,7 +37,7 @@ class TestGameForm:
 
 
 class TestQuestion:
-    def test_save_answer_fields(self):
+    def test_save_answer_fields_for_non_respondent(self):
         question = Question(answer_idx=None, answer_text="")
         question.save_answer_fields(
             answer_idx=1, answer_text="text", is_respondent=False
@@ -46,7 +46,7 @@ class TestQuestion:
         assert question.answer_idx is None
 
     @pytest.mark.django_db
-    def test_save_answer_fields(self):
+    def test_save_answer_fields_on_respondent_request(self):
         question = factories.question_factory(answer_idx=None, answer_text="")
         question.save_answer_fields(
             answer_idx=1, answer_text="text", is_respondent=True
@@ -92,7 +92,7 @@ class TestScoreSelections:
         respondent_selection = Selection(option_idx=0)
 
         selections = [selection0, selection1, selection2]
-        scored_selections = utils.score_selections(
+        utils.score_selections(
             selections=selections,
             respondent_selection=respondent_selection,
             points=1,
@@ -109,7 +109,7 @@ class TestScoreSelections:
         respondent_selection = Selection(option_idx=0)
 
         selections = [selection0, selection1, selection2]
-        selections = utils.score_selections(
+        utils.score_selections(
             selections=selections,
             respondent_selection=respondent_selection,
             points=1,

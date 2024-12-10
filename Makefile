@@ -25,6 +25,9 @@ db: dropdb createdb migrate seeds
 install:
 	uv sync --all-groups
 
+installci:
+	uv sync --group test --group lint
+
 test:
 	uv run pytest
 
@@ -33,6 +36,10 @@ web:
 
 fmt:
 	uv run ruff format .
+
+fmtci:
+	uv run ruff format . --check
+	uv run ruff check .
 
 djade:
 	git ls-files -z -- '*.html' | xargs -0 djade
@@ -46,6 +53,9 @@ cov:
 	uv run coverage html
 	open htmlcov/index.html
 
+covci:
+	uv run pytest tests/ --cov=forcedfun -v --durations=25 --cov-fail-under=100 --cov-report=term
+
 build:
 	docker build \
 		  --progress=plain \
@@ -57,6 +67,8 @@ shell:
 
 seeds:
 	uv run ./manage.py seeds
+
+
 
 mypy:
 	uv run mypy forcedfun --strict

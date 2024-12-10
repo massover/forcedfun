@@ -51,13 +51,13 @@ def register_view(request: HttpRequest) -> HttpResponse:
     if request.method == "POST" and form.is_valid():
         user = form.save()
         login(request, user)
-        next = request.GET.get("next")
+        next_param = request.GET.get("next", "")
         url_is_safe = url_has_allowed_host_and_scheme(
-            url=next,
+            url=next_param,
             allowed_hosts={request.get_host()},
             require_https=request.is_secure(),
         )
-        redirect_to = next if url_is_safe else reverse("index")
+        redirect_to = next_param if url_is_safe else reverse("index")
         return HttpResponseRedirect(redirect_to)
     return render(request, "forcedfun/register.html", {"form": form})
 
