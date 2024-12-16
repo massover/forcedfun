@@ -70,7 +70,7 @@ def game_detail_view(request: AuthenticatedHttpRequest, slug: str) -> HttpRespon
     )
     ordered_questions = game.questions.order_by("points", "id")
     questions = list(ordered_questions.exclude(scored_at__isnull=True).all())
-    latest_scored_at = ordered_questions.filter(scored_at__isnull=True).aggregate(
+    latest_scored_at = ordered_questions.filter(scored_at__isnull=False).aggregate(
         latest_scored_at=Max("scored_at")
     )["latest_scored_at"]
     delta = timezone.now() - (latest_scored_at or timezone.now())
