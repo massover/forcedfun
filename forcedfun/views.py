@@ -1,4 +1,5 @@
 import typing
+from datetime import timedelta
 
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_not_required
@@ -78,7 +79,7 @@ def game_detail_view(request: AuthenticatedHttpRequest, slug: str) -> HttpRespon
     if latest_scored_at is None and next_question is not None:  # pragma: no cover
         # if it's the first question, always show it
         questions.append(next_question)
-    elif (delta.seconds // 3600) > 12 and next_question:  # pragma: no cover
+    elif delta > timedelta(seconds=3600) and next_question:  # pragma: no cover
         # if it's the second question, make sure it's been 12 hours since the last question was complete
         questions.append(next_question)
 
