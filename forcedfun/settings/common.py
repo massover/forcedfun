@@ -15,7 +15,7 @@ DATABASE_URL = os.getenv(
     "DATABASE_URL", "postgres://forcedfun:@localhost:5432/forcedfun"
 )
 
-test_options = {"NAME": DATABASE_URL.split("/")[-1]}
+test_options = {"NAME": f"test_{DATABASE_URL.split("/")[-1]}"}
 DATABASES = {
     "default": dj_database_url.parse(
         DATABASE_URL, conn_max_age=500, test_options=test_options

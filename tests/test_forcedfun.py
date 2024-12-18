@@ -1,4 +1,7 @@
 import pytest
+from django.contrib.auth.models import User
+from django.contrib.messages.middleware import MessageMiddleware
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.http import Http404
@@ -12,6 +15,7 @@ from forcedfun.models import Selection
 from forcedfun import utils
 from forcedfun.forms import GameForm
 from forcedfun.settings.utils import getbool
+from forcedfun.utils import AuthenticatedHttpRequest
 
 
 def test_for_cov():
@@ -120,120 +124,19 @@ class TestScoreSelections:
         assert respondent_selection.points == 1
 
 
-# @pytest.mark.django_db
-# class TestScoreSelection:
-# def test_set_points(self):
-#     selections = [
-#         Selection(option_idx=0),
-#         Selection(option_idx=1),
-#         Selection(option_idx=0),
-#     ]
-#     respondent_selection = [
-#         Selection(option_idx=0),
-#     ]
-#
-#
-# def test_user_selections_get_points_from_respondent_answer(self):
-#     game = factories.game_factory()
-#     respondent = factories.user_factory(username="respondent")
-#     user1 = factories.user_factory(username="user1")
-#     options = ("option1", "option2")
-#     question = factories.question_factory(
-#         respondent=respondent,
-#         game=game,
-#         options=options,
-#         points=1,
-#         answer_idx=0,
-#         answer_text=options[0],
-#     )
-#     respondent_selection = factories.selection_factory(
-#         user=respondent,
-#         question=question,
-#         option_idx=0,
-#         option_text=question.options[0],
-#         points=None,
-#     )
-#     user1_selection = factories.selection_factory(
-#         user=user1,
-#         question=question,
-#         option_idx=0,
-#         option_text=question.options[0],
-#         points=None,
-#     )
-#
-#     user2 = factories.user_factory(username="user2")
-#     user2_selection = factories.selection_factory(
-#         user=user2,
-#         question=question,
-#         option_idx=1,
-#         option_text=question.options[1],
-#         points=None,
-#     )
-#     question.score_selections()
-#     respondent_selection.refresh_from_db()
-#     user1_selection.refresh_from_db()
-#     user2_selection.refresh_from_db()
-#
-#
-#     assert respondent_selection.points == 1
-#     assert user1_selection.points == 1
-#     assert user2_selection.points == 0
-#
-# def test_respondent_selection_gets_no_points_if_less_than_half_match(self):
-#     game = factories.game_factory()
-#     respondent = factories.user_factory(username="respondent")
-#     user1 = factories.user_factory(username="user1")
-#
-#     options = ("option1", "option2")
-#     question = factories.question_factory(
-#         respondent=respondent,
-#         game=game,
-#         options=options,
-#         points=1,
-#         answer_idx=0,
-#         answer_text=options[0],
-#     )
-#
-#     respondent_selection = factories.selection_factory(
-#         user=respondent,
-#         question=question,
-#         option_idx=0,
-#         option_text=question.options[0],
-#         points=None,
-#     )
-#     user1_selection = factories.selection_factory(
-#         user=user1,
-#         question=question,
-#         option_idx=0,
-#         option_text=question.options[0],
-#         points=None,
-#     )
-#
-#     user2 = factories.user_factory(username="user2")
-#     user2_selection = factories.selection_factory(
-#         user=user2,
-#         question=question,
-#         option_idx=1,
-#         option_text=question.options[1],
-#         points=None,
-#     )
-#     user3 = factories.user_factory(username="user3")
-#     user3_selection = factories.selection_factory(
-#         user=user3,
-#         question=question,
-#         option_idx=1,
-#         option_text=question.options[1],
-#         points=None,
-#     )
-#
-# a
-#     question.score_selections()
-#     respondent_selection.refresh_from_db()
-#     user1_selection.refresh_from_db()
-#     user2_selection.refresh_from_db()
-#     user3_selection.refresh_from_db()
-#
-#     assert respondent_selection.points == 0
-#     assert user1_selection.points == 1
-#     assert user2_selection.points == 0
-#     assert user3_selection.points == 0
+@pytest.mark.django_db
+def test_user_in_game_check_or_302(user):
+    game = factories.game_factory(users=())
+    request = AuthenticatedHttpRequest()
+    request.user = User()
+    middleware = SessionMiddleware(get_response=lambda request: None)
+    middleware(request)
+    middleware = MessageMiddleware(get_response=lambda request: None)
+    middleware(request)
+    with pytest.raises(Http302):
+        utils.user_in_game_check_or_302(request, game, redirect_to="index")
+
+    # happy path does noFt explode
+    game.users.add(user)
+    request.user = user
+    utils.user_in_game_check_or_302(request, game, redirect_to="index")
