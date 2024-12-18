@@ -3,6 +3,8 @@
 
 {% block body %}
 <h1>{{ game.slug }}</h1>
+<p><a href="{% url 'game-detail' game.slug %}"><< Back</a></p>
+
 <main>
   <fieldset>
     <p><small>{{ question.points }} point {{ question.points|pluralize }}</small></p>
