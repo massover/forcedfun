@@ -71,8 +71,8 @@ def test_login_required_view_get_ok(name, method, user_client):
 
 
 class TestGameDetailView:
-    def test_ok(self, user_client):
-        game = factories.game_factory()
+    def test_ok(self, user_client, user):
+        game = factories.game_factory(users=(user,))
         url = reverse("game-detail", kwargs={"slug": game.slug})
         response = user_client.get(url)
         assert response.status_code == 200
@@ -80,7 +80,7 @@ class TestGameDetailView:
 
 class TestQuestionDetailView:
     def test_ok(self, user_client, user):
-        question = factories.question_factory()
+        question = factories.question_factory(respondent=user)
         factories.selection_factory(user=user, question=question)
         url = reverse("question-detail", kwargs={"pk": question.pk})
         response = user_client.get(url)
@@ -117,13 +117,13 @@ class TestSelectionCreateView:
         assert question.scored_at <= timezone.now()
 
     def test_get_ok(self, user_client, user):
-        question = factories.question_factory()
+        question = factories.question_factory(respondent=user)
         url = reverse("selection-create", kwargs={"question_pk": question.pk})
         response = user_client.get(url)
         assert response.status_code == 200
 
     def test_post_ok(self, user_client, user):
-        question = factories.question_factory()
+        question = factories.question_factory(respondent=user)
         data = {
             "option_idx": 0,
             "option_text": question.options[0],
@@ -134,7 +134,7 @@ class TestSelectionCreateView:
         assert Selection.objects.count() == 1, response.content.decode()
 
     def test_post_error(self, user_client, user):
-        question = factories.question_factory()
+        question = factories.question_factory(respondent=user)
         data = {
             "option_idx": 0,
         }

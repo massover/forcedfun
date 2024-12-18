@@ -66,16 +66,23 @@ def register_view(request: HttpRequest) -> HttpResponse:
 @require_GET
 def game_detail_view(request: AuthenticatedHttpRequest, slug: str) -> HttpResponse:
     game = get_object_or_404(Game, slug=slug)
+    utils.user_in_game_check_or_302(request, game, redirect_to=reverse("index"))
     users = game.users.order_by("username").annotate(
         points=Coalesce(Sum("selections__points"), 0)
     )
     ordered_questions = game.questions.order_by("points", "id")
-    questions = list(ordered_questions.exclude(scored_at__isnull=True).all())
+    questions = list(
+        ordered_questions.exclude(scored_at__isnull=True).select_related("respondent")
+    )
     latest_scored_at = ordered_questions.filter(scored_at__isnull=False).aggregate(
         latest_scored_at=Max("scored_at")
     )["latest_scored_at"]
     delta = timezone.now() - (latest_scored_at or timezone.now())
-    next_question = ordered_questions.filter(scored_at__isnull=True).first()
+    next_question = (
+        ordered_questions.filter(scored_at__isnull=True)
+        .select_related("respondent")
+        .first()
+    )
     if latest_scored_at is None and next_question is not None:  # pragma: no cover
         # if it's the first question, always show it
         questions.append(next_question)
@@ -94,6 +101,9 @@ def game_detail_view(request: AuthenticatedHttpRequest, slug: str) -> HttpRespon
 @require_GET
 def question_detail_view(request: AuthenticatedHttpRequest, pk: int) -> HttpResponse:
     question = get_object_or_404(Question, pk=pk)
+    utils.user_in_game_check_or_302(
+        request, question.game, redirect_to=reverse("index")
+    )
     # if selection does not exists for this player then redirect to selection create
     check = (
         question.scored_at is None
@@ -146,6 +156,9 @@ class SelectionCreateView(View):
 
     def get(self, request: AuthenticatedHttpRequest, question_pk: int) -> HttpResponse:
         question = get_object_or_404(Question, pk=question_pk)
+        utils.user_in_game_check_or_302(
+            request, question.game, redirect_to=reverse("index")
+        )
         # if selection already exists for this player for this question then redirect to question detail
         utils.check_or_302(
             Selection.objects.filter(question=question, user=request.user).exists(),
@@ -183,6 +196,9 @@ class SelectionCreateView(View):
 
     def post(self, request: AuthenticatedHttpRequest, question_pk: int) -> HttpResponse:
         question = get_object_or_404(Question, pk=question_pk)
+        utils.user_in_game_check_or_302(
+            request, question.game, redirect_to=reverse("index")
+        )
         utils.check_or_302(
             Selection.objects.filter(question=question, user=request.user).exists(),
             redirect_to=reverse("question-detail", kwargs={"pk": question.pk}),

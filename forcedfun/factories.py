@@ -35,8 +35,10 @@ def selection_factory(
     )
 
 
-def game_factory(slug: str = "gamedefault") -> Game:
-    return Game.objects.create(slug=slug)
+def game_factory(slug: str = "gamedefault", users: typing.Sequence[User] = ()) -> Game:
+    game = Game.objects.create(slug=slug)
+    game.users.add(*users)
+    return game
 
 
 def question_factory(
@@ -48,9 +50,10 @@ def question_factory(
     answer_text: str = "",
     scored_at: datetime | None = None,
 ) -> Question:
+    respondent = respondent or user_factory()
     return Question.objects.create(
-        game=game or game_factory(),
-        respondent=respondent or user_factory(),
+        game=game or game_factory(users=(respondent,)),
+        respondent=respondent,
         options=options,
         points=points,
         scored_at=scored_at,

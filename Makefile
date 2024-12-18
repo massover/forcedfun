@@ -31,6 +31,9 @@ installci:
 test:
 	uv run pytest
 
+testlf:
+	uv run pytest --lf
+
 web:
 	uv run ./manage.py runserver
 

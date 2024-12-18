@@ -25,6 +25,7 @@
     <tr>
       <th>Question</th>
       <th>Options</th>
+      <th>Respondent</th>
       <th>Points</th>
     </tr>
 
@@ -35,6 +36,7 @@
         {{ forloop.revcounter }}
       </td>
       <td><a href="{% url "question-detail" pk=question.pk %}">{{ question.options|join:" or " }}</a> </td>
+      <td>{{ question.respondent.username }}</td>
       <td>{{ question.points }}</td>
     </tr>
   {% endfor %}
