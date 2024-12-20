@@ -23,4 +23,9 @@ urlpatterns = [
         name="selection-create",
     ),
     path("question/<int:pk>/", views.question_detail_view, name="question-detail"),
+    path(
+        "question/<int:pk>/score/",
+        views.QuestionScoreView.as_view(),
+        name="question-score",
+    ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

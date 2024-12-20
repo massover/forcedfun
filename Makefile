@@ -39,6 +39,7 @@ web:
 
 fmt:
 	uv run ruff format .
+	uv run ruff check .
 
 fmtci:
 	uv run ruff format . --check

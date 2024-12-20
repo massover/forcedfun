@@ -6,10 +6,25 @@
 <a href="{% url 'game-detail' game.slug %}"><< Back</a>
 
 <main>
+
+  {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+  {% endif %}
    <p>
-     <small>{{ question.points }} point {{ question.points|pluralize }}</small>
+     <small>
+       {{ question.points }} point {{ question.points|pluralize }}<br>
+       {% if question.scored_at %}
+       Scored {{ question.scored_at|timesince }} ago
+       {% endif %}
+     </small>
+
    </p>
   <p> Would {{ question.respondent.username }} rather: </p>
+
   <table>
     {% for option in question.options %}
       <tr>
@@ -26,6 +41,12 @@
     {% endfor %}
   </table>
 
+  {% if user.is_superuser and question.scored_at is None %}
+      <form method="POST" action="{% url "question-score" question.pk %}">
+      {% csrf_token %}
+      <button type="submit">Score Now</button>
+      </form>
+  {% endif %}
   <table>
     <tr>
     <th>&nbsp;</th>
