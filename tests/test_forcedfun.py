@@ -1,7 +1,5 @@
 import pytest
 from django.contrib.auth.models import User
-from django.contrib.messages.middleware import MessageMiddleware
-from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.http import Http404
@@ -15,7 +13,6 @@ from forcedfun.models import Selection
 from forcedfun import utils
 from forcedfun.forms import GameForm
 from forcedfun.settings.utils import getbool
-from forcedfun.utils import AuthenticatedHttpRequest
 
 
 def test_for_cov():
@@ -125,18 +122,15 @@ class TestScoreSelections:
 
 
 @pytest.mark.django_db
-def test_user_in_game_check_or_302(user):
+def test_user_in_game_check_or_302(user, authenticated_request):
     game = factories.game_factory(users=())
-    request = AuthenticatedHttpRequest()
-    request.user = User()
-    middleware = SessionMiddleware(get_response=lambda request: None)
-    middleware(request)
-    middleware = MessageMiddleware(get_response=lambda request: None)
-    middleware(request)
+    authenticated_request.user = User()
     with pytest.raises(Http302):
-        utils.user_in_game_check_or_302(request, game, redirect_to="index")
+        utils.user_in_game_check_or_302(
+            authenticated_request, game, redirect_to="index"
+        )
 
-    # happy path does noFt explode
+    # happy path does not explode
     game.users.add(user)
-    request.user = user
-    utils.user_in_game_check_or_302(request, game, redirect_to="index")
+    authenticated_request.user = user
+    utils.user_in_game_check_or_302(authenticated_request, game, redirect_to="index")

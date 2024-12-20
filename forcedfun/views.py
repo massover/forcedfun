@@ -1,9 +1,11 @@
 import typing
 from datetime import timedelta
 
+from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.db.models import Max
 from django.db.models import OuterRef
@@ -21,6 +23,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views import View
 from django.views.decorators.http import require_GET
 
+from .errors import Http302
 from .forms import GameForm
 from .forms import SelectionForm
 
@@ -136,6 +139,52 @@ def question_detail_view(request: AuthenticatedHttpRequest, pk: int) -> HttpResp
         "question": question,
     }
     return render(request, "forcedfun/question_detail.html", context)
+
+
+class QuestionScoreView(UserPassesTestMixin, View):
+    def test_func(self) -> bool:
+        return self.request.user.is_superuser
+
+    def get_respodent_selection_or_302(
+        self, request: AuthenticatedHttpRequest, question: Question
+    ) -> Selection:
+        try:
+            respondent_selection = question.selections.get(user=question.respondent)
+        except Selection.DoesNotExist:
+            messages.warning(
+                request, "Unable to score. Respondent selection not found."
+            )
+            raise Http302(reverse("question-detail", kwargs={"pk": question.pk}))
+
+        return respondent_selection
+
+    def get_selections_or_302(
+        self, request: AuthenticatedHttpRequest, question: Question
+    ) -> typing.Sequence[Selection]:
+        selections = list(question.selections.exclude(user=question.respondent))
+        if len(selections) == 0:
+            messages.warning(
+                request, "Unable to score. No non-respondent selections found"
+            )
+            raise Http302(reverse("question-detail", kwargs={"pk": question.pk}))
+
+        return selections
+
+    def post(self, request: AuthenticatedHttpRequest, pk: int) -> HttpResponse:
+        question = get_object_or_404(Question, pk=pk)
+        respondent_selection = self.get_respodent_selection_or_302(request, question)
+        selections = self.get_selections_or_302(request, question)
+        scored_selections = utils.score_selections(
+            selections=selections,
+            respondent_selection=respondent_selection,
+            points=question.points,
+        )
+        Selection.objects.bulk_update(scored_selections, fields=["points"])
+        question.scored_at = timezone.now()
+        question.save(update_fields=["scored_at"])
+        return HttpResponseRedirect(
+            reverse("question-detail", kwargs={"pk": question.pk})
+        )
 
 
 class SelectionCreateView(View):

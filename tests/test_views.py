@@ -1,11 +1,15 @@
+from unittest.mock import MagicMock
+
 import pytest
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils import timezone
 
 from forcedfun import factories
+from forcedfun.errors import Http302
 from forcedfun.models import Question
 from forcedfun.models import Selection
+from forcedfun.views import QuestionScoreView
 from forcedfun.views import SelectionCreateView
 
 
@@ -85,6 +89,54 @@ class TestQuestionDetailView:
         url = reverse("question-detail", kwargs={"pk": question.pk})
         response = user_client.get(url)
         assert response.status_code == 200
+
+
+class TestQuestionScoreView:
+    def test_test_func(self):
+        view = QuestionScoreView()
+        is_superuser = True
+        view.request = MagicMock(user=User(is_superuser=is_superuser))
+        assert view.test_func() == is_superuser
+
+    @pytest.mark.django_db
+    def test_get_respondent_selection_happy_path(self, authenticated_request):
+        view = QuestionScoreView()
+        selection = factories.selection_factory()
+        view.get_respodent_selection_or_302(authenticated_request, selection.question)
+
+    def test_get_respondent_selection_raises_302_if_respondent_has_not_selected(
+        self, user, authenticated_request
+    ):
+        view = QuestionScoreView()
+        question = factories.question_factory()
+        with pytest.raises(Http302):
+            view.get_respodent_selection_or_302(authenticated_request, question)
+
+    def test_get_selections_happy_path(self, authenticated_request, user):
+        view = QuestionScoreView()
+        selection = factories.selection_factory()
+        factories.selection_factory(question=selection.question, user=user)
+        view.get_selections_or_302(authenticated_request, selection.question)
+
+    def test_get_selections_raises_302_if_respondent_has_not_selected(
+        self, user, authenticated_request
+    ):
+        view = QuestionScoreView()
+        question = factories.question_factory()
+        with pytest.raises(Http302):
+            view.get_selections_or_302(authenticated_request, question)
+
+    def test_post(self, admin_user, admin_client):
+        respondent_selection = factories.selection_factory()
+        respondent_selection.question.game.users.add(admin_user)
+        selection = factories.selection_factory(
+            question=respondent_selection.question, user=admin_user
+        )
+        url = reverse("question-score", kwargs={"pk": selection.question.pk})
+        response = admin_client.post(url, follow=True)
+        assert response.status_code == 200, response.content.decode()
+        selection.question.refresh_from_db()
+        assert selection.question.scored_at is not None, response.content.decode()
 
 
 class TestSelectionCreateView:
