@@ -1,5 +1,5 @@
 {% extends 'forcedfun/base.html' %}
-{% load static %}
+{% load forcedfun_tags static %}
 
 {% block body %}
 <h1>{{ game.slug }}</h1>
@@ -26,7 +26,8 @@
   <p> Would {{ question.respondent.username }} rather: </p>
 
   <table>
-    {% for option in question.options %}
+    {% zip question.options option_pcts as zipped %}
+    {% for option, option_pct in zipped %}
       <tr>
         <td>{{ option }}</td>
         <td>
@@ -37,6 +38,21 @@
           {% else %}
             &#10005;
           {% endif %}</td>
+        <td
+            {% if respondent_selection and forloop.counter0 == respondent_selection.option_idx and question_selections_exist %}
+              {% if option_pct >= 50 %}
+                class="correct"
+              {% else %}
+                class="wrong"
+              {% endif %}
+            {% endif %}
+          >
+          <small
+
+          >
+            {{ option_pct }}%
+          </small>
+        </td>
       <tr>
     {% endfor %}
   </table>
