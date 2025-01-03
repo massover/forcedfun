@@ -16,7 +16,7 @@
   {% endif %}
    <p>
      <small>
-       {{ question.points }} point {{ question.points|pluralize }}<br>
+       {{ question.points }} point{{ question.points|pluralize }}<br>
        {% if question.scored_at %}
        Scored {{ question.scored_at|timesince }} ago
        {% endif %}
@@ -47,11 +47,7 @@
               {% endif %}
             {% endif %}
           >
-          <small
-
-          >
-            {{ option_pct }}%
-          </small>
+          <small>{{ option_pct }}</small>
         </td>
       <tr>
     {% endfor %}
