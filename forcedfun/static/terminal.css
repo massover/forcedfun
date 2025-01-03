@@ -114,7 +114,6 @@ button[disabled]{
   background: color-mix(in srgb, #EE4B2B 35%, transparent);
 }
 
-
 .correct {
   background: color-mix(in srgb, #AAFF00 35%, transparent);
 }

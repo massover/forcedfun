@@ -1,3 +1,4 @@
+import collections
 import typing
 from datetime import timedelta
 
@@ -131,12 +132,26 @@ def question_detail_view(request: AuthenticatedHttpRequest, pk: int) -> HttpResp
         option_text=Subquery(question_selections[:1].values("option_text")),
         option_idx=Subquery(question_selections[:1].values("option_idx")),
     )
+    option_pcts = []
+    option_idx_list = [user.option_idx for user in users if user.option_idx is not None]
+    n_option_idx_list = len(option_idx_list)
+    question_selections_exist = bool(n_option_idx_list)
+    counter = collections.Counter(option_idx_list)
+    for i, _ in enumerate(question.options):
+        value = counter.get(i, 0)
+        try:
+            pct = (value / n_option_idx_list) * 100
+        except ZeroDivisionError:
+            pct = 0
+        option_pcts.append(round(pct))
 
     context = {
         "respondent_selection": respondent_selection,
         "users": users,
         "game": game,
         "question": question,
+        "option_pcts": option_pcts,
+        "question_selections_exist": question_selections_exist,
     }
     return render(request, "forcedfun/question_detail.html", context)
 

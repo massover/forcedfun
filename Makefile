@@ -46,7 +46,7 @@ fmtci:
 	uv run ruff check .
 
 djade:
-	git ls-files -z -- '*.html' | xargs -0 djade
+	git ls-files -z -- '*.html' | xargs -0 uv run djade
 
 run:
 	docker run -it --entrypoint /bin/bash forcedfun:local
