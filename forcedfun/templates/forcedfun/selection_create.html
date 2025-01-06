@@ -7,7 +7,7 @@
 
 <main>
   <fieldset>
-    <p><small>{{ question.points }} point {{ question.points|pluralize }}</small></p>
+    <p><small>{{ question.points }} point{{ question.points|pluralize }}</small></p>
     {% if user.id == question.respondent_id %}
       <p> {{ user.username }}, would you rather:</p>
     {% else %}
