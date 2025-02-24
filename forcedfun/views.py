@@ -10,6 +10,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.db.models import Max
 from django.db.models import OuterRef
+from django.db.models import Q
 from django.db.models import Subquery
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
@@ -71,8 +72,9 @@ def register_view(request: HttpRequest) -> HttpResponse:
 def game_detail_view(request: AuthenticatedHttpRequest, slug: str) -> HttpResponse:
     game = get_object_or_404(Game, slug=slug)
     utils.user_in_game_check_or_302(request, game, redirect_to=reverse("index"))
+    sum_filter = Q(selections__question__game=game)
     users = game.users.order_by("username").annotate(
-        points=Coalesce(Sum("selections__points"), 0)
+        points=Coalesce(Sum("selections__points", filter=sum_filter), 0)
     )
     ordered_questions = game.questions.order_by("points", "id")
     questions = list(
