@@ -279,7 +279,7 @@ class SelectionCreateView(View):
             )
             question.save_answer_fields(
                 answer_idx=form.cleaned_data["option_idx"],
-                answer_text=form.cleaned_data["option_idx"],
+                answer_text=form.cleaned_data["option_text"],
                 is_respondent=question.respondent == request.user,
             )
 
